@@ -13,7 +13,7 @@ var _ = Describe("cfmanifest", func() {
 			path, err := fixtures.FixturePath("manifest-oneapp.yml")
 			Expect(err).NotTo(HaveOccurred())
 
-			manifest, err := cfmanifest.NewSSHManifestFromManifestPath(path)
+			manifest, err := cfmanifest.NewSSHManifestFromManifestPath(path, "")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(len(manifest.Applications())).To(Equal(1))
 			app := manifest.FirstApplication()
@@ -27,7 +27,7 @@ var _ = Describe("cfmanifest", func() {
 			path, err := fixtures.FixturePath("manifest-twoapps.yml")
 			Expect(err).NotTo(HaveOccurred())
 
-			manifest, err := cfmanifest.NewSSHManifestFromManifestPath(path)
+			manifest, err := cfmanifest.NewSSHManifestFromManifestPath(path, "")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(len(manifest.Applications())).To(Equal(1))
 			app := manifest.FirstApplication()
