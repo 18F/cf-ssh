@@ -15,12 +15,15 @@ import (
 )
 
 func cmdSSH(c *cli.Context) {
+	tmate_command := "curl BOOTSTRAP_URL | sh"
+
 	// TODO: confirm that `cf` and `ssh` are in path
 	// TODO: Windows: cf.exe and ssh.exe?
 	manifestPath, err := filepath.Abs(c.String("manifest"))
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	var manifest *cfmanifest.Manifest
 	if _, err := os.Stat(manifestPath); os.IsNotExist(err) {
 		log.Fatal("USAGE: cf-ssh -f manifest.yml")
@@ -32,7 +35,7 @@ func cmdSSH(c *cli.Context) {
 		// }
 		// manifest = cfmanifest.NewSSHManifest(appName)
 	} else {
-		manifest, err = cfmanifest.NewSSHManifestFromManifestPath(manifestPath)
+		manifest, err = cfmanifest.NewSSHManifestFromManifestPath(manifestPath, tmate_command)
 		if err != nil {
 			log.Fatalf("Manifest %s exists but failed to load: %s", manifestPath, err)
 		}
@@ -59,7 +62,7 @@ func cmdSSH(c *cli.Context) {
 		log.Fatalf("Failed to run SSH container: %s", err)
 	}
 
-	var sshUser, sshHost string
+	var sshUser string
 	fmt.Print("Initiating tmate connection...")
 	time.Sleep(1 * time.Second)
 	for counter := 0; counter < 10; counter++ {
@@ -76,7 +79,7 @@ func cmdSSH(c *cli.Context) {
 			log.Fatalf("Failed to get recent logs: %s", err)
 		}
 		logs := out.String()
-		sshHostLine, err := regexp.CompilePOSIX("=====> (.*)@(.*)$")
+		sshHostLine, err := regexp.CompilePOSIX(`=====> ssh -p2222 (.*)`)
 		if err != nil {
 			log.Fatalf("Invalid POSIX regular expression: %s", err)
 		}
@@ -84,7 +87,6 @@ func cmdSSH(c *cli.Context) {
 		if sshHostMatches != nil {
 			sshHostMatch := sshHostMatches[len(sshHostMatches)-1]
 			sshUser = sshHostMatch[1]
-			sshHost = sshHostMatch[2]
 			break
 		} else {
 			fmt.Print(".")
@@ -96,15 +98,19 @@ func cmdSSH(c *cli.Context) {
 	}
 
 	fmt.Print("success\n")
-	cmd = exec.Command("ssh", "-t", "-t", fmt.Sprintf("%s@%s", sshUser, sshHost))
+	cmd = exec.Command("ssh", "-t", "-p2222", fmt.Sprintf("%s@TMATE_URL", sshUser))
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Run()
 
-	// Either:
-	// cf delete $ssh_appname -f
-	// cf stop $ssh_appname
+	// Delete app
+	cmd = exec.Command("cf", "d", sshAppname, "-f")
+	if c.Bool("verbose") {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
+	cmd.Run()
 
 }
 
