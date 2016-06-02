@@ -131,6 +131,7 @@ func main() {
 
 	app.Usage = "SSH into a Cloud Foundry app container"
 	app.Action = cmdSSH
+	app.Version = "v3"
 
 	app.Run(os.Args)
 }
