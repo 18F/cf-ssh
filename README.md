@@ -3,6 +3,13 @@ cf-ssh
 
 SSH into a running container for your Cloud Foundry application, run one-off tasks, debug your app, and more.
 
+This repository provides a [cloud.gov](https://cloud.gov/)-specific version of cf-ssh (see the [18f branch](https://github.com/18F/cf-ssh/tree/18f)). We forked this tool from the [Cloud Foundry community cf-ssh](https://github.com/cloudfoundry-community/cf-ssh).
+
+For installation and usage instructions, [see "Running One-Off Tasks" in the cloud.gov docs](https://docs.cloud.gov/getting-started/one-off-tasks/#cf-ssh).
+
+More about this project
+------------
+
 Initial implementation requires the application to have a `manifest.yml`.
 
 Also, `cf-ssh` requires that you run the command from within the project source folder. It performs a `cf push` to create a new application based on the same source code/path, buildpack, and variables. Once CF Runtime supports copy app bits [#78847148](https://www.pivotaltracker.com/story/show/78847148), then `cf-ssh` will be upgraded to use app bit copying, and not require local access to project app bits.
@@ -33,23 +40,15 @@ Using the `go.crypto` library I was getting the following error. In future, perh
 unable to connect: ssh: handshake failed: ssh: no common algorithms
 ```
 
-Installation
+Installation and usage
 ------------
 
-Download a [pre-compiled release](https://github.com/cloudfoundry-community/cf-ssh/releases) for your platform. Place it in your `$PATH` or `%PATH%` and rename to `cf-ssh` (or `cf-ssh.exe` for Windows).
+For installation and usage instructions, [see "Running One-Off Tasks" in the cloud.gov documentation](https://docs.cloud.gov/getting-started/one-off-tasks/#cf-ssh).
 
-Alternately, if you have Go setup you can build it from source:
-
-```
-go get github.com/cloudfoundry-community/cf-ssh
-```
-
-Usage
------
+Those instructions explain installing the pre-compiled version. If you want to build it from source, make sure you have Go set up and then run this command:
 
 ```
-cd path/to/app
-cf-ssh -f manifest.yml
+go get github.com/18F/cf-ssh/tree/18f
 ```
 
 Publish releases
